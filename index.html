@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slow to Anger — Depths to Heights</title>
+<meta name="description" content="Anger & Rage App for Christians: anger tracker, calming prayers, breathing exercises, Bible teaching (Eph 4:26; James 1:20), and 'Redeem your reactions' practice. Runs offline.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%2399d98c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect rx='12' width='64' height='64' fill='url(%23g)'/%3E%3Ctext x='50%25' y='58%25' font-family='Segoe UI, Roboto' font-size='30' font-weight='900' text-anchor='middle' fill='%230a0a0a'%3ESA%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#fffaf3;         /* warm ivory */
+    --ink:#1b1b18;           /* near-black */
+    --muted:#5f6b5f;         /* olive gray */
+    --card:#ffffff;          /* white card */
+    --line:#eadcc4;          /* soft line */
+    --terracotta:#e76f51;    /* accent 1 */
+    --sun:#f4a261;           /* accent 2 */
+    --sage:#84a98c;          /* accent 3 */
+    --olive:#52796f;         /* dark olive */
+    --sky:#3da9fc;           /* sky blue */
+    --good:#16a34a;          /* success */
+    --warn:#f59e0b;          /* warning */
+    --danger:#ef4444;        /* danger */
+    --shadow:0 14px 40px rgba(0,0,0,.15);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--ink); background:
+      radial-gradient(1200px 700px at 120% -10%, rgba(244,162,97,.25), transparent 60%),
+      radial-gradient(900px 560px at -10% -10%, rgba(132,169,140,.22), transparent 60%),
+      var(--paper);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    line-height:1.65;
+  }
+
+  /* Topbar */
+  .topbar{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px) saturate(130%); background:rgba(255,255,255,.75); border-bottom:1px solid var(--line)}
+  .top-inner{max-width:980px; margin:0 auto; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0}
+  .logo{width:44px; height:44px; border-radius:14px; display:grid; place-items:center; color:#0a0a0a; font-weight:900;
+        background:conic-gradient(from 200deg, var(--sun), var(--terracotta), var(--sage), var(--sky), var(--sun)); box-shadow:inset 0 0 0 2px #0b0b0b0d}
+  .title{display:flex; flex-direction:column; min-width:0}
+  .title h1{margin:0; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .title .sub{margin:0; color:var(--muted); font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .actions{display:flex; gap:8px; align-items:center}
+  .icon-btn{border:1px solid var(--line); background:#fff; color:var(--ink); padding:8px 10px; border-radius:12px; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; gap:8px}
+  .icon-btn[aria-pressed="true"]{background:linear-gradient(135deg, var(--sage), var(--sun)); color:#0b0b0b; border-color:transparent}
+
+  /* Layout */
+  main{max-width:980px; margin:0 auto; padding:16px; padding-bottom:100px}
+  .screen{display:none}
+  .screen.active{display:block}
+  .cards{display:grid; gap:14px; grid-template-columns:repeat(2, minmax(0,1fr))}
+  @media (max-width:820px){.cards{grid-template-columns:1fr}}
+
+  /* Components */
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px}
+  .tag{display:inline-block; padding:2px 8px; border-radius:999px; background:#fef3c7; color:#9a3412; font-weight:800; font-size:.75rem}
+  .btn{border:0; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:900; background:linear-gradient(135deg, var(--sun), var(--terracotta)); color:#0b0b0b}
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--ink)}
+  .btn.sage{background:linear-gradient(135deg, var(--sage), var(--olive)); color:#0b0b0b}
+  .btn.sky{background:linear-gradient(135deg, var(--sky), #a0e7ff); color:#0b0b0b}
+  .btn.warn{background:linear-gradient(135deg, var(--warn), var(--sun)); color:#0b0b0b}
+  .btn.danger{background:linear-gradient(135deg, var(--danger), var(--terracotta)); color:#fff}
+  .btn.tiny{padding:7px 10px; font-size:.9rem}
+  .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; font-weight:800; font-size:.85rem; background:#fff; border:1px solid var(--line)}
+  .muted{color:var(--muted)}
+  .caps{letter-spacing:.05em; text-transform:uppercase; font-weight:900; font-size:.8rem; color:#6b7280}
+  .grid-2{display:grid; gap:12px; grid-template-columns:repeat(2, minmax(0,1fr))}
+  @media (max-width:740px){.grid-2{grid-template-columns:1fr}}
+  textarea,input,select{width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#fffdf8; color:var(--ink); outline:none}
+  textarea{min-height:100px; resize:vertical}
+  .list{display:flex; flex-direction:column; gap:10px; margin-top:8px}
+  .item{display:flex; flex-direction:column; gap:6px; border:1px solid var(--line); background:#fffefb; border-radius:12px; padding:10px}
+  .meta{font-size:.9rem; color:var(--muted)}
+
+  /* Bottom nav */
+  .bottom-nav{position:fixed; left:0; right:0; bottom:0; z-index:60; background:rgba(255,255,255,.92); border-top:1px solid var(--line); backdrop-filter:blur(6px)}
+  .nav-inner{max-width:980px; margin:0 auto; padding:8px 12px; display:flex; gap:6px}
+  .nav-btn{flex:1; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:14px; padding:10px 6px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; font-weight:800; font-size:.85rem}
+  .nav-btn.active{background:linear-gradient(135deg, var(--sage), var(--sun)); color:#0b0b0b; border-color:transparent}
+  .nav-icon{font-size:1.1rem}
+
+  /* Modal */
+  .modal{position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; z-index:70; background:rgba(0,0,0,.45)}
+  .modal.show{display:flex}
+  .sheet{width:100%; max-width:720px; max-height:85vh; overflow:auto; background:#fff; border:1px solid var(--line); border-radius:20px 20px 0 0; padding:16px 14px 100px}
+  .sheet h3{margin:.25rem 0 .5rem}
+  .sheet .close{position:sticky; top:0; display:flex; justify-content:flex-end}
+  .close .btn{background:#fff; color:var(--ink)}
+
+  /* Toast */
+  .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:76px; z-index:80; background:linear-gradient(135deg, var(--sage), var(--sun)); color:#0b0b0b; font-weight:900; padding:10px 14px; border-radius:12px; display:none}
+  .toast.show{display:inline-block}
+
+  /* Progress / Charts */
+  .progress{height:12px; border-radius:999px; background:#fff; border:1px solid var(--line); overflow:hidden}
+  .bar{height:100%; width:0%; background:linear-gradient(90deg, var(--sage), var(--sun)); transition:width .3s ease}
+
+  /* Box breathing square */
+  .square{width:140px; height:140px; border:3px solid var(--olive); border-radius:12px; margin:8px auto; position:relative}
+  .dot{width:16px; height:16px; border-radius:50%; background:var(--terracotta); position:absolute; top:-8px; left:-8px; box-shadow:0 6px 12px rgba(0,0,0,.15)}
+</style>
+</head>
+<body>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="top-inner">
+      <div class="brand">
+        <div class="logo">SA</div>
+        <div class="title">
+          <h1>Slow to Anger — Redeem Your Reactions</h1>
+          <div class="sub">Depths to Heights • Practical help for triggers, tempers, and tenderness</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="musicBtn" class="icon-btn" aria-pressed="false" title="Background music"><span id="musicIcon">▶︎</span> Music</button>
+        <button id="openInfo" class="icon-btn" title="Info">ℹ️</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="screen active" role="region" aria-label="Home">
+      <div class="panel">
+        <div class="pill">If you are in crisis, please contact your local helpline for immediate support.</div>
+        <div class="cards" style="margin-top:12px">
+          <div class="card">
+            <span class="tag">Tracker</span>
+            <h2>Anger Tracker</h2>
+            <p class="muted">Log triggers, body sensations, intensity, and response. See trends and export your journal.</p>
+            <div class="btn-row">
+              <button class="btn" data-nav="tracker">Open Tracker</button>
+              <button class="btn ghost btn-sm" data-nav="tracker">New Entry</button>
+            </div>
+          </div>
+          <div class="card">
+            <span class="tag">Calm</span>
+            <h2>Prayers & Breathing</h2>
+            <p class="muted">Voice-guided prayers and box-breathing. Choose your voice, rate, and pitch.</p>
+            <div class="btn-row">
+              <button class="btn sage" data-nav="calming">Start Calming</button>
+              <button class="btn ghost btn-sm" data-nav="calming">Voice Settings</button>
+            </div>
+          </div>
+          <div class="card">
+            <span class="tag">Bible</span>
+            <h2>Teaching on Anger</h2>
+            <p class="muted">Ephesians 4:26 • James 1:20 • Proverbs 15:1 • Ecclesiastes 7:9 — short, practical notes.</p>
+            <div class="btn-row"><button class="btn" data-nav="resources">Open</button></div>
+          </div>
+          <div class="card">
+            <span class="tag">Practice</span>
+            <h2>Redeem Your Reactions</h2>
+            <p class="muted">Guided steps to pause, name, ask, and choose a holy response. Save your plan.</p>
+            <div class="btn-row"><button class="btn sky" data-nav="exercises">Start Exercise</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>My Week at a Glance</h3>
+        <canvas id="chart" height="120" style="width:100%; border:1px solid var(--line); border-radius:12px; background:#fff"></canvas>
+        <div class="grid-2">
+          <div>
+            <div class="caps">Entries this week</div>
+            <div id="statCount" style="font-weight:900; font-size:1.4rem">0</div>
+          </div>
+          <div>
+            <div class="caps">Average intensity</div>
+            <div id="statAvg" style="font-weight:900; font-size:1.4rem">0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRACKER -->
+    <section id="tracker" class="screen" role="region" aria-label="Tracker">
+      <div class="pill">Anger Tracker</div>
+      <div style="height:10px"></div>
+
+      <div class="panel">
+        <h3>New Entry</h3>
+        <div class="grid-2">
+          <div>
+            <label class="caps" for="trigger">Trigger / Situation</label>
+            <textarea id="trigger" placeholder="e.g., Felt disrespected by a co-worker; traffic jam; unfair comment."></textarea>
+          </div>
+          <div>
+            <label class="caps">Body Sensations</label>
+            <div class="grid-2">
+              <label><input type="checkbox" class="sens" value="tight chest"> Tight chest</label>
+              <label><input type="checkbox" class="sens" value="hot face"> Hot face</label>
+              <label><input type="checkbox" class="sens" value="clenched jaw"> Clenched jaw</label>
+              <label><input type="checkbox" class="sens" value="shaky hands"> Shaky hands</label>
+              <label><input type="checkbox" class="sens" value="stomach knot"> Stomach knot</label>
+              <label><input type="checkbox" class="sens" value="headache"> Headache</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="caps" for="intensity">Intensity (1–10)</label>
+            <input id="intensity" type="range" min="1" max="10" value="4">
+          </div>
+          <div>
+            <label class="caps" for="response">Initial Response</label>
+            <select id="response">
+              <option>Held it in (suppressed)</option>
+              <option>Exploded (outburst)</option>
+              <option>Passive-aggressive</option>
+              <option>Prayed/Paused</option>
+              <option>Spoke the truth in love</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="caps" for="tags">Tags</label>
+            <select id="tags" multiple>
+              <option value="disrespect">Disrespect</option>
+              <option value="injustice">Injustice</option>
+              <option value="traffic">Traffic</option>
+              <option value="fatigue">Fatigue</option>
+              <option value="family">Family</option>
+              <option value="work">Work</option>
+              <option value="boundaries">Boundaries</option>
+              <option value="shame">Shame</option>
+            </select>
+            <div class="meta">Tip: Hold Ctrl/Cmd to select multiple.</div>
+          </div>
+          <div>
+            <label class="caps" for="outcome">What I did next / Outcome</label>
+            <textarea id="outcome" placeholder="e.g., Took 3 breaths, apologized, set a boundary, walked away, journaled, etc."></textarea>
+          </div>
+        </div>
+
+        <div style="height:6px"></div>
+        <div class="btn-row">
+          <button class="btn" id="saveEntry">Save Entry</button>
+          <button class="btn ghost" id="clearForm">Clear</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="grid-2" style="align-items:end">
+          <div>
+            <h3>My Entries</h3>
+            <div class="meta">Filter by tag</div>
+            <select id="filterTag">
+              <option value="">(All)</option>
+              <option value="disrespect">Disrespect</option>
+              <option value="injustice">Injustice</option>
+              <option value="traffic">Traffic</option>
+              <option value="fatigue">Fatigue</option>
+              <option value="family">Family</option>
+              <option value="work">Work</option>
+              <option value="boundaries">Boundaries</option>
+              <option value="shame">Shame</option>
+            </select>
+          </div>
+          <div class="btn-row" style="justify-content:flex-end">
+            <button class="btn tiny" id="exportEntries">Download .txt</button>
+            <button class="btn tiny" id="copyEntries">Copy</button>
+          </div>
+        </div>
+        <div id="entryList" class="list"></div>
+      </div>
+
+      <div style="height:10px"></div>
+      <button class="btn ghost tiny" data-nav="home">← Back to Home</button>
+    </section>
+
+    <!-- CALMING -->
+    <section id="calming" class="screen" role="region" aria-label="Calming">
+      <div class="pill">Prayers & Breathing</div>
+      <div style="height:10px"></div>
+
+      <div class="panel">
+        <div class="grid-2">
+          <div>
+            <h3>Voice Settings</h3>
+            <label class="caps" for="voiceSel">Voice</label>
+            <select id="voiceSel"></select>
+            <div class="grid-2">
+              <div>
+                <label class="caps" for="rate">Rate</label>
+                <input id="rate" type="range" min="0.7" max="1.4" step="0.05" value="0.95">
+              </div>
+              <div>
+                <label class="caps" for="pitch">Pitch</label>
+                <input id="pitch" type="range" min="0.7" max="1.4" step="0.05" value="1.0">
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top:6px">
+              <button class="btn sage tiny" id="previewVoice">Preview Voice</button>
+              <button class="btn ghost tiny" id="saveVoice">Save as Default</button>
+            </div>
+            <div class="meta">Uses your device voices (SpeechSynthesis).</div>
+          </div>
+          <div>
+            <h3>Breathing — Box (4-4-4-4)</h3>
+            <p class="muted">Breathe in 4 • hold 4 • out 4 • hold 4. Follow the moving dot.</p>
+            <div class="square">
+              <div id="dot" class="dot" aria-hidden="true"></div>
+            </div>
+            <div class="grid-2" style="align-items:center">
+              <div class="caps" id="phaseLabel">Ready</div>
+              <div>
+                <div class="progress"><div id="breathBar" class="bar"></div></div>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top:6px">
+              <button class="btn sage tiny" id="startBox">Start</button>
+              <button class="btn ghost tiny" id="stopBox">Stop</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Calming Prayers</h3>
+        <div id="prayerList" class="list"></div>
+        <div class="btn-row" style="margin-top:6px">
+          <button class="btn tiny" id="playAllPrayers">Play All</button>
+          <button class="btn ghost tiny" id="stopPrayers">Stop</button>
+        </div>
+      </div>
+
+      <div style="height:10px"></div>
+      <button class="btn ghost tiny" data-nav="home">← Back to Home</button>
+    </section>
+
+    <!-- EXERCISES -->
+    <section id="exercises" class="screen" role="region" aria-label="Exercises">
+      <div class="pill">Redeem Your Reactions</div>
+      <div style="height:10px"></div>
+      <div class="panel">
+        <h3>Guided Practice</h3>
+        <div class="grid-2">
+          <div>
+            <label class="caps" for="gxEvent">1) Pause & Name the Event</label>
+            <textarea id="gxEvent" placeholder="What happened? What was said/done?"></textarea>
+          </div>
+          <div>
+            <label class="caps" for="gxStory">2) Name the Story / Meaning</label>
+            <textarea id="gxStory" placeholder="What story did you tell yourself? (e.g., 'They don't respect me.')"></textarea>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label class="caps" for="gxAsk">3) Ask God</label>
+            <textarea id="gxAsk" placeholder="God, what do You say? (Eph 4:26 — be angry, do not sin.)"></textarea>
+          </div>
+          <div>
+            <label class="caps" for="gxChoose">4) Choose a Holy Action</label>
+            <textarea id="gxChoose" placeholder="e.g., Take 3 breaths, ask a clarifying question, speak truth in love, set a boundary."></textarea>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn sky" id="savePlan">Save Plan</button>
+          <button class="btn ghost" id="readPlan">Read Aloud</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Saved Plans</h3>
+        <div id="planList" class="list"></div>
+      </div>
+      <div style="height:10px"></div>
+      <button class="btn ghost tiny" data-nav="home">← Back to Home</button>
+    </section>
+
+    <!-- RESOURCES / TEACHING -->
+    <section id="resources" class="screen" role="region" aria-label="Resources">
+      <div class="pill">Biblical Teaching on Anger</div>
+      <div style="height:10px"></div>
+
+      <div class="panel">
+        <details open class="item">
+          <summary><strong>Ephesians 4:26 — “Be angry and do not sin.”</strong></summary>
+          <p>Anger signals that something matters—often justice or boundaries. The command is not “never be angry” but <em>don’t let anger master you</em>. Move from reaction to response: pause, pray, plan.</p>
+          <ul>
+            <li><strong>Practice:</strong> 3 deep breaths → name the trigger → ask, “What would love do?”</li>
+            <li><strong>Boundary tip:</strong> “I want to understand, but I won’t be yelled at. Let’s talk when we’re calmer.”</li>
+          </ul>
+        </details>
+
+        <details class="item">
+          <summary><strong>James 1:20 — “The anger of man does not produce the righteousness of God.”</strong></summary>
+          <p>Human anger alone rarely creates God’s good outcomes. We need God’s wisdom to transform anger into patient, truthful action.</p>
+          <ul>
+            <li><strong>Replace:</strong> reactivity → patience • accusation → questions • control → clarity.</li>
+          </ul>
+        </details>
+
+        <details class="item">
+          <summary><strong>Proverbs 15:1 — “A gentle answer turns away wrath.”</strong></summary>
+          <p>Tone matters. Gentleness is strength under control. Lower volume, slow pace, open posture.</p>
+        </details>
+
+        <details class="item">
+          <summary><strong>Ecclesiastes 7:9 — “Be not quick in your spirit to become angry.”</strong></summary>
+          <p>Slowness creates space for the Spirit. Speed fuels sparks; slowness allows wisdom.</p>
+        </details>
+
+        <details class="item">
+          <summary><strong>Righteous vs. Sinful Anger — Quick Checks</strong></summary>
+          <ul>
+            <li><strong>Righteous:</strong> aims for restoration, tells the truth, protects the weak, submits to Scripture.</li>
+            <li><strong>Sinful:</strong> humiliates, controls, keeps score, refuses correction, seeks revenge.</li>
+          </ul>
+        </details>
+
+        <div class="item">
+          <strong>Short Prayers</strong>
+          <ul>
+            <li>“Lord, slow my breath and speed my listening.”</li>
+            <li>“Father, set a guard over my mouth (Ps 141:3).”</li>
+            <li>“Spirit, show me a holy next step.”</li>
+          </ul>
+        </div>
+
+        <div class="item">
+          <strong>Safety Note</strong>
+          <p>If anger connects to abuse or addiction, seek trained help and set strong boundaries. Love does not enable harm.</p>
+        </div>
+
+        <div class="item">
+          <strong>Helpful Links</strong>
+          <div class="btn-row">
+            <button class="btn tiny" onclick="window.open('https://depthstoheights.org','_blank')">Depths to Heights</button>
+            <button class="btn tiny" onclick="window.open('mailto:depthstoheights@gmail.com','_blank')">Email Support</button>
+            <button class="btn tiny" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=8GRE7B8C3TP2U','_blank')">Donate via PayPal</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:10px"></div>
+      <button class="btn ghost tiny" data-nav="home">← Back to Home</button>
+    </section>
+
+    <!-- CRISIS -->
+    <section id="crisis" class="screen" role="region" aria-label="Crisis">
+      <div class="pill">Crisis Support</div>
+      <div style="height:10px"></div>
+      <div class="panel">
+        <h3>If you are in crisis</h3>
+        <p>“If you are in crisis, please contact your local helpline for immediate support.” Reach out to a trusted person and your local services now.</p>
+      </div>
+      <div class="panel">
+        <h3>Quick Grounding (5-5 senses)</h3>
+        <ul class="muted">
+          <li>See 5 things • Touch 4 • Hear 3 • Smell 2 • Taste 1</li>
+          <li>Breathe with the box timer on the <em>Calming</em> page.</li>
+        </ul>
+      </div>
+      <div style="height:10px"></div>
+      <button class="btn ghost tiny" data-nav="home">← Back to Home</button>
+    </section>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav" aria-label="Primary">
+    <div class="nav-inner">
+      <button class="nav-btn active" data-nav="home"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-btn" data-nav="crisis"><span class="nav-icon">🆘</span>Crisis</button>
+      <button class="nav-btn" data-nav="resources"><span class="nav-icon">📚</span>Resources</button>
+      <button class="nav-btn" id="infoBtn"><span class="nav-icon">ℹ️</span>Info</button>
+      <button class="nav-btn" id="aboutBtn"><span class="nav-icon">❤️</span>About</button>
+    </div>
+  </nav>
+
+  <!-- INFO MODAL -->
+  <div id="infoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="sheet">
+      <div class="close"><button class="btn tiny" id="infoClose">Close</button></div>
+      <h3 id="infoTitle">Info — What this app does</h3>
+      <p><strong>Slow to Anger</strong> helps you track triggers, practice calm, learn Scripture’s way, and choose holy actions when mad.</p>
+      <ul>
+        <li><strong>Anger Tracker:</strong> journal triggers, intensity, responses; view weekly trends; export.</li>
+        <li><strong>Calming:</strong> voice-guided prayers + box-breathing with visual timer.</li>
+        <li><strong>Teaching:</strong> short, biblical notes (Eph 4:26; James 1:20).</li>
+        <li><strong>Redeem your reactions:</strong> guided steps to plan a holy response and save it.</li>
+      </ul>
+      <h3>How to use</h3>
+      <ol>
+        <li>Log today’s moments in <em>Tracker</em>. Be honest & brief.</li>
+        <li>Do <em>Calming</em> (breath + prayer) before a hard convo.</li>
+        <li>Read one <em>Teaching</em> card; practice the tip.</li>
+        <li>Use <em>Exercises</em> to plan a response for recurring triggers.</li>
+      </ol>
+      <h3>Install on your phone</h3>
+      <ul>
+        <li><strong>iPhone (Safari):</strong> Share → <em>Add to Home Screen</em></li>
+        <li><strong>Android (Chrome):</strong> Menu ⋮ → <em>Add to Home Screen</em></li>
+      </ul>
+      <div class="btn-row">
+        <button class="btn tiny" onclick="window.open('https://depthstoheights.org','_blank')">Website</button>
+        <button class="btn tiny" onclick="window.open('mailto:depthstoheights@gmail.com','_blank')">Email</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="sheet">
+      <div class="close"><button class="btn tiny" id="aboutClose">Close</button></div>
+      <h3 id="aboutTitle">About • Depths to Heights</h3>
+      <p><strong>Made by Justin</strong> • Depths to Heights</p>
+      <p><a href="https://depthstoheights.org" target="_blank" rel="noopener">depthstoheights.org</a> • <a href="mailto:depthstoheights@gmail.com" target="_blank" rel="noopener">depthstoheights@gmail.com</a></p>
+      <p><strong>Mission:</strong> From the deepest places to the highest praise—helping people encounter the Father’s love, grow in Scripture, and live whole.</p>
+      <div class="btn-row">
+        <button class="btn tiny" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=8GRE7B8C3TP2U','_blank')">Donate via PayPal</button>
+      </div>
+      <div style="height:6px"></div>
+      <div class="panel">
+        <h3>Privacy & Data</h3>
+        <p class="muted">Your data stays on this device (LocalStorage). No accounts/servers.</p>
+        <div class="btn-row">
+          <button class="btn warn tiny" id="exportAll">Export All Data</button>
+          <button class="btn danger tiny" id="resetAll">Reset App (local)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================
+   DATA
+   ========================================= */
+const PRAYERS = [
+  {title:"Prayer for Slowness", text:"Lord, make me quick to listen, slow to speak, and slow to become angry. Set a guard over my mouth and steady my breath. Amen. (James 1:19; Psalm 141:3)"},
+  {title:"Prayer for Wisdom", text:"Father, give me wisdom that is pure, peaceable, open to reason, full of mercy and good fruits. Show me a next step that honors You. Amen. (James 3:17)"},
+  {title:"Prayer for Boundaries", text:"God, help me speak the truth in love. Give me courage to say what is right without harshness or fear. Amen. (Ephesians 4:15)"},
+  {title:"Prayer for Reconciliation", text:"Jesus, where it depends on me, help me pursue peace. Heal what anger has harmed, and lead me in the way everlasting. Amen. (Romans 12:18; Psalm 139:24)"}
+];
+
+/* =========================================
+   STATE & STORAGE
+   ========================================= */
+const KEY="dth_slow_to_anger";
+const state = {
+  view:"home",
+  musicOn:false,
+  entries:[],     // {id, ts, trigger, sensations[], intensity, response, tags[], outcome}
+  voice:{name:null, rate:0.95, pitch:1.0},
+  plans:[]        // {id, ts, event, story, ask, choose}
+};
+function load(){ try{ Object.assign(state, JSON.parse(localStorage.getItem(KEY)||"{}")); }catch(e){} }
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1800); }
+
+/* =========================================
+   NAVIGATION
+   ========================================= */
+const SCREENS = {
+  home:document.getElementById('home'),
+  tracker:document.getElementById('tracker'),
+  calming:document.getElementById('calming'),
+  exercises:document.getElementById('exercises'),
+  resources:document.getElementById('resources'),
+  crisis:document.getElementById('crisis')
+};
+function show(view){
+  state.view=view; save();
+  Object.values(SCREENS).forEach(s=>s.classList.remove('active'));
+  SCREENS[view].classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.nav===view));
+  if(view==="home") { renderStats(); drawChart(); }
+  if(view==="tracker") { renderEntries(); }
+  if(view==="calming") { renderPrayers(); populateVoices(); }
+  if(view==="exercises") { renderPlans(); }
+}
+document.addEventListener('click', (e)=>{
+  const nav = e.target.closest('[data-nav]');
+  if(nav){ show(nav.dataset.nav); }
+});
+document.getElementById('infoBtn').addEventListener('click', ()=>document.getElementById('infoModal').classList.add('show'));
+document.getElementById('aboutBtn').addEventListener('click', ()=>document.getElementById('aboutModal').classList.add('show'));
+document.getElementById('openInfo').addEventListener('click', ()=>document.getElementById('infoModal').classList.add('show'));
+document.getElementById('infoClose').addEventListener('click', ()=>document.getElementById('infoModal').classList.remove('show'));
+document.getElementById('aboutClose').addEventListener('click', ()=>document.getElementById('aboutModal').classList.remove('show'));
+
+/* =========================================
+   BACKGROUND MUSIC — gentle plucks + echo
+   ========================================= */
+let ac=null, master=null, delay=null, seqTimer=null;
+const SCALE=[196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 392.00]; // G major-ish
+function startMusic(){
+  if(!ac){ ac = new (window.AudioContext||window.webkitAudioContext)(); }
+  master = ac.createGain(); master.gain.value=0.06;
+  delay = ac.createDelay(2.0); delay.delayTime.value=0.28;
+  const fb = ac.createGain(); fb.gain.value=0.25; delay.connect(fb).connect(delay);
+  delay.connect(master).connect(ac.destination);
+
+  // sequence every beat
+  let step=0;
+  seqTimer = setInterval(()=>{
+    const note = SCALE[(step*2 + Math.floor(Math.random()*3)) % SCALE.length];
+    pluck(note, 0.8); // main pluck
+    if(Math.random()<0.5) pluck(SCALE[(step+3)%SCALE.length]/2, 0.5); // lower supportive
+    step++;
+  }, 600);
+
+  state.musicOn=true; save();
+  document.getElementById('musicBtn').setAttribute('aria-pressed','true');
+  document.getElementById('musicIcon').textContent='⏸';
+  toast('Music on');
+}
+function pluck(freq, vol){
+  const o = ac.createOscillator(); o.type='sine'; o.frequency.value=freq;
+  const g = ac.createGain(); g.gain.setValueAtTime(0, ac.currentTime);
+  g.gain.linearRampToValueAtTime(0.7*vol, ac.currentTime+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0008, ac.currentTime+1.5);
+  const bp = ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=freq*2; bp.Q.value=10;
+  o.connect(bp).connect(g).connect(delay);
+  o.start(); o.stop(ac.currentTime+1.6);
+}
+function stopMusic(){
+  try{ clearInterval(seqTimer); }catch(e){}
+  seqTimer=null; if(master) master.disconnect(); if(ac){ ac.close(); ac=null; }
+  state.musicOn=false; save();
+  document.getElementById('musicBtn').setAttribute('aria-pressed','false');
+  document.getElementById('musicIcon').textContent='▶︎';
+  toast('Music off');
+}
+document.getElementById('musicBtn').addEventListener('click', ()=>{ state.musicOn ? stopMusic() : startMusic(); });
+
+/* =========================================
+   TRACKER — save, list, filter, export
+   ========================================= */
+const entryList=document.getElementById('entryList');
+document.getElementById('saveEntry').addEventListener('click', ()=>{
+  const trigger = document.getElementById('trigger').value.trim();
+  const intensity = parseInt(document.getElementById('intensity').value,10)||1;
+  const response = document.getElementById('response').value;
+  const outcome = document.getElementById('outcome').value.trim();
+  const sens = [...document.querySelectorAll('.sens:checked')].map(x=>x.value);
+  const tagSel = document.getElementById('tags');
+  const tags = [...tagSel.selectedOptions].map(o=>o.value);
+  if(!trigger){ toast('Add a short trigger.'); return; }
+  const entry = {id:Date.now(), ts:Date.now(), trigger, sensations:sens, intensity, response, tags, outcome};
+  state.entries.push(entry); save();
+  document.getElementById('trigger').value=''; document.getElementById('outcome').value=''; document.querySelectorAll('.sens:checked').forEach(x=>x.checked=false);
+  drawChart(); renderStats(); renderEntries(); toast('Entry saved');
+});
+document.getElementById('clearForm').addEventListener('click', ()=>{
+  document.getElementById('trigger').value=''; document.getElementById('outcome').value='';
+  document.querySelectorAll('.sens:checked').forEach(x=>x.checked=false);
+});
+document.getElementById('filterTag').addEventListener('change', renderEntries);
+
+function renderEntries(){
+  entryList.innerHTML='';
+  const tagFilter = document.getElementById('filterTag').value;
+  const rows = [...state.entries].sort((a,b)=>b.ts-a.ts).filter(e=>!tagFilter || (e.tags||[]).includes(tagFilter));
+  if(rows.length===0){ const d=document.createElement('div'); d.className='muted'; d.textContent='No entries yet.'; entryList.appendChild(d); return; }
+  rows.forEach(e=>{
+    const item=document.createElement('div'); item.className='item';
+    item.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div>
+          <div class="meta">${new Date(e.ts).toLocaleString()} • Intensity: <strong>${e.intensity}</strong> • Response: ${e.response}</div>
+          <div><strong>Trigger:</strong> ${escapeHtml(e.trigger)}</div>
+          ${(e.sensations&&e.sensations.length)?`<div class="meta">Body: ${e.sensations.map(escapeHtml).join(', ')}</div>`:''}
+          ${(e.tags&&e.tags.length)?`<div class="meta">Tags: ${e.tags.map(escapeHtml).join(', ')}</div>`:''}
+          ${e.outcome?`<div><strong>Outcome:</strong> ${escapeHtml(e.outcome)}</div>`:''}
+        </div>
+        <div class="btn-row">
+          <button class="btn tiny" data-edit="${e.id}">Edit</button>
+          <button class="btn ghost tiny" data-del="${e.id}">Delete</button>
+        </div>
+      </div>`;
+    entryList.appendChild(item);
+  });
+}
+entryList.addEventListener('click',(e)=>{
+  const idD=e.target.getAttribute('data-del');
+  const idE=e.target.getAttribute('data-edit');
+  if(idD){
+    const idx=state.entries.findIndex(x=>x.id===Number(idD));
+    if(idx>-1){
+      const removed=state.entries.splice(idx,1)[0]; save(); renderEntries(); drawChart(); renderStats();
+      const t=document.getElementById('toast'); t.innerHTML='Deleted. <button class="btn tiny" id="undoDel">Undo</button>'; t.classList.add('show');
+      const undo=()=>{ state.entries.push(removed); save(); renderEntries(); drawChart(); renderStats(); t.classList.remove('show'); toast('Restored'); };
+      document.addEventListener('click', function handler(ev){ if(ev.target && ev.target.id==='undoDel'){ undo(); document.removeEventListener('click', handler); }}, {once:true});
+      setTimeout(()=>t.classList.remove('show'),4000);
+    }
+  }
+  if(idE){
+    const row=state.entries.find(x=>x.id===Number(idE)); if(!row) return;
+    const sheet=document.createElement('div'); sheet.className='sheet';
+    sheet.innerHTML=`
+      <div class="close"><button class="btn tiny" id="eClose">Close</button></div>
+      <h3>Edit Entry</h3>
+      <label class="caps">Trigger</label><textarea id="eTrig">${escapeHtml(row.trigger)}</textarea>
+      <label class="caps">Intensity</label><input id="eInt" type="range" min="1" max="10" value="${row.intensity}">
+      <label class="caps">Response</label>
+      <select id="eResp">
+        <option ${row.response==='Held it in (suppressed)'?'selected':''}>Held it in (suppressed)</option>
+        <option ${row.response==='Exploded (outburst)'?'selected':''}>Exploded (outburst)</option>
+        <option ${row.response==='Passive-aggressive'?'selected':''}>Passive-aggressive</option>
+        <option ${row.response==='Prayed/Paused'?'selected':''}>Prayed/Paused</option>
+        <option ${row.response==='Spoke the truth in love'?'selected':''}>Spoke the truth in love</option>
+      </select>
+      <label class="caps">Outcome</label><textarea id="eOut">${escapeHtml(row.outcome||'')}</textarea>
+      <div class="btn-row" style="margin-top:6px"><button class="btn sage tiny" id="eSave">Save</button></div>
+    `;
+    const modal=document.createElement('div'); modal.className='modal show'; modal.style.zIndex='80'; modal.appendChild(sheet);
+    document.body.appendChild(modal);
+    modal.addEventListener('click',(ev)=>{ if(ev.target && ev.target.id==='eClose') modal.remove(); });
+    sheet.querySelector('#eSave').addEventListener('click', ()=>{
+      row.trigger=sheet.querySelector('#eTrig').value.trim();
+      row.intensity=parseInt(sheet.querySelector('#eInt').value,10)||row.intensity;
+      row.response=sheet.querySelector('#eResp').value;
+      row.outcome=sheet.querySelector('#eOut').value.trim();
+      row.ts=Date.now();
+      save(); renderEntries(); drawChart(); renderStats(); modal.remove(); toast('Updated ✓');
+    });
+  }
+});
+document.getElementById('exportEntries').addEventListener('click', ()=>{
+  const lines = [...state.entries].sort((a,b)=>a.ts-b.ts).map(e=>`Date: ${new Date(e.ts).toLocaleString()}\nIntensity: ${e.intensity}\nResponse: ${e.response}\nTrigger: ${e.trigger}\nBody: ${(e.sensations||[]).join(', ')}\nTags: ${(e.tags||[]).join(', ')}\nOutcome: ${e.outcome||''}\n---`).join('\n');
+  const blob=new Blob([lines],{type:'text/plain;charset=utf-8'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='slow-to-anger-entries.txt'; document.body.appendChild(a); a.click(); setTimeout(()=>{a.remove(); URL.revokeObjectURL(url);},0);
+  toast('Downloaded');
+});
+document.getElementById('copyEntries').addEventListener('click', async ()=>{
+  const lines = [...state.entries].sort((a,b)=>a.ts-b.ts).map(e=>`${new Date(e.ts).toLocaleString()} | ${e.intensity} | ${e.response} | ${e.trigger}`).join('\n');
+  try{ await navigator.clipboard.writeText(lines); toast('Copied'); }catch(e){ toast('Copy not available'); }
+});
+
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+/* =========================================
+   HOME STATS + CHART
+   ========================================= */
+function renderStats(){
+  const weekAgo=Date.now()-7*24*3600*1000;
+  const week=state.entries.filter(e=>e.ts>=weekAgo);
+  const count=week.length;
+  const avg=count? Math.round(week.reduce((a,b)=>a+b.intensity,0)/count*10)/10 : 0;
+  document.getElementById('statCount').textContent = count;
+  document.getElementById('statAvg').textContent = avg;
+}
+function drawChart(){
+  const cvs=document.getElementById('chart'); const ctx=cvs.getContext('2d');
+  const W=cvs.width=cvs.clientWidth; const H=cvs.height;
+  ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#eadcc4"; ctx.lineWidth=1; // grid
+  for(let i=0;i<=10;i++){ const y=H-10 - i*(H-20)/10; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  const last = [...state.entries].sort((a,b)=>a.ts-b.ts).slice(-20);
+  if(last.length===0){ ctx.fillStyle="#9ca3af"; ctx.fillText("No data yet — add entries in Tracker", 10, H/2); return; }
+  const maxInt=10;
+  const minTs=last[0].ts, maxTs=last[last.length-1].ts||minTs+1;
+  ctx.strokeStyle="#84a98c"; ctx.lineWidth=2; ctx.beginPath();
+  last.forEach((e,i)=>{
+    const x = 10 + (W-20)*( (e.ts-minTs)/(maxTs-minTs||1) );
+    const y = H-10 - (H-20)*(e.intensity/maxInt);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // dots
+  ctx.fillStyle="#e76f51";
+  last.forEach((e)=>{
+    const x = 10 + (W-20)*((e.ts-minTs)/(maxTs-minTs||1));
+    const y = H-10 - (H-20)*(e.intensity/maxInt);
+    ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+  });
+}
+
+/* =========================================
+   VOICE SETTINGS (SpeechSynthesis)
+   ========================================= */
+const voiceSel=document.getElementById('voiceSel');
+const rateEl=document.getElementById('rate');
+const pitchEl=document.getElementById('pitch');
+
+function populateVoices(){
+  const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  voiceSel.innerHTML='';
+  if(!vs || vs.length===0){ const o=document.createElement('option'); o.value=''; o.text='(Device voice unavailable)'; voiceSel.appendChild(o); voiceSel.disabled=true; return; }
+  vs.forEach(v=>{ const o=document.createElement('option'); o.value=v.name; o.text=`${v.name} ${v.lang?`(${v.lang})`:''}`; voiceSel.appendChild(o); });
+  if(state.voice.name){
+    const opt=[...voiceSel.options].find(o=>o.value===state.voice.name);
+    if(opt) voiceSel.value=state.voice.name;
+  }
+  rateEl.value=state.voice.rate||0.95; pitchEl.value=state.voice.pitch||1.0;
+}
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged = populateVoices; }
+
+document.getElementById('previewVoice').addEventListener('click', ()=>{
+  speak("This is your selected voice. Breathe in... two... three... four. Hold. And out... two... three... four.");
+});
+document.getElementById('saveVoice').addEventListener('click', ()=>{
+  state.voice.name=voiceSel.value||null;
+  state.voice.rate=parseFloat(rateEl.value||0.95);
+  state.voice.pitch=parseFloat(pitchEl.value||1.0);
+  save(); toast('Voice saved');
+});
+function speak(text){
+  if(!('speechSynthesis' in window)) { toast('Device voice not available'); return; }
+  const u=new SpeechSynthesisUtterance(text);
+  const vs=speechSynthesis.getVoices();
+  const v=vs.find(x=>x.name===voiceSel.value) || vs.find(x=>x.lang && x.lang.toLowerCase().startsWith('en')) || vs[0];
+  if(v) u.voice=v;
+  u.rate=parseFloat(rateEl.value||state.voice.rate||0.95);
+  u.pitch=parseFloat(pitchEl.value||state.voice.pitch||1.0);
+  speechSynthesis.speak(u);
+}
+function stopSpeak(){ if('speechSynthesis' in window) speechSynthesis.cancel(); }
+
+/* =========================================
+   PRAYERS LIST (Calming)
+   ========================================= */
+const prayerList=document.getElementById('prayerList');
+function renderPrayers(){
+  prayerList.innerHTML='';
+  PRAYERS.forEach((p,i)=>{
+    const item=document.createElement('div'); item.className='item';
+    item.innerHTML=`
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div>
+          <strong>${p.title}</strong>
+          <div class="meta">${p.text.slice(0,80)}${p.text.length>80?'…':''}</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn sage tiny" data-play="${i}">Play</button>
+          <button class="btn ghost tiny" data-show="${i}">Read</button>
+        </div>
+      </div>`;
+    prayerList.appendChild(item);
+  });
+}
+prayerList.addEventListener('click',(e)=>{
+  const play=e.target.getAttribute('data-play');
+  const show=e.target.getAttribute('data-show');
+  if(play!=null){ speak(PRAYERS[Number(play)].text); }
+  if(show!=null){
+    const p=PRAYERS[Number(show)];
+    const sheet=document.createElement('div'); sheet.className='sheet';
+    sheet.innerHTML=`
+      <div class="close"><button class="btn tiny" id="pClose">Close</button></div>
+      <h3>${p.title}</h3>
+      <p>${p.text}</p>
+      <div class="btn-row"><button class="btn sage tiny" id="pPlay">Play</button></div>`;
+    const modal=document.createElement('div'); modal.className='modal show'; modal.style.zIndex='85'; modal.appendChild(sheet);
+    document.body.appendChild(modal);
+    modal.addEventListener('click',(ev)=>{ if(ev.target && ev.target.id==='pClose') modal.remove(); });
+    sheet.querySelector('#pPlay').addEventListener('click', ()=>speak(p.text));
+  }
+});
+document.getElementById('playAllPrayers').addEventListener('click', async ()=>{
+  if(!('speechSynthesis' in window)){ toast('Device voice not available'); return; }
+  for(const p of PRAYERS){ await speakWait(p.text); await sleep(400); }
+  toast('Done');
+});
+document.getElementById('stopPrayers').addEventListener('click', ()=>{ stopSpeak(); toast('Stopped'); });
+function speakWait(utterText){ return new Promise(res=>{ const u=new SpeechSynthesisUtterance(utterText); const vs=speechSynthesis.getVoices(); const v=vs.find(x=>x.name===voiceSel.value)||vs[0]; if(v) u.voice=v; u.rate=parseFloat(rateEl.value||0.95); u.pitch=parseFloat(pitchEl.value||1.0); u.onend=res; u.onerror=res; speechSynthesis.speak(u); }); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* =========================================
+   BOX BREATHING (4-4-4-4)
+   ========================================= */
+let boxTimer=null, phase=0, tStart=0;
+const PHASES=[{name:'Inhale',s:4},{name:'Hold',s:4},{name:'Exhale',s:4},{name:'Hold',s:4}];
+function startBox(){
+  stopBox();
+  phase=0; tStart=performance.now();
+  loopBox();
+}
+function loopBox(){
+  const bar=document.getElementById('breathBar');
+  const label=document.getElementById('phaseLabel');
+  const dot=document.getElementById('dot');
+  const sq=document.querySelector('.square');
+  const now=performance.now();
+  const dur=PHASES[phase].s*1000;
+  const el=now-tStart;
+  const pct=Math.min(1, el/dur);
+  bar.style.width=(pct*100)+'%'; label.textContent=PHASES[phase].name;
+  // move dot along square perimeter
+  const L=sq.clientWidth-16; // path length per side
+  let x=0,y=0;
+  const total=4; const pos = phase + pct; // which side + progress
+  if(pos<1){ x=L*pct; y=0; }
+  else if(pos<2){ x=L; y=L*(pct); }
+  else if(pos<3){ x=L*(1-pct); y=L; }
+  else { x=0; y=L*(1-pct); }
+  dot.style.transform=`translate(${x}px, ${y}px)`;
+  if(el>=dur){ phase=(phase+1)%PHASES.length; tStart=performance.now(); }
+  boxTimer=requestAnimationFrame(loopBox);
+}
+function stopBox(){
+  if(boxTimer) cancelAnimationFrame(boxTimer);
+  boxTimer=null; document.getElementById('phaseLabel').textContent='Ready';
+  document.getElementById('breathBar').style.width='0%';
+}
+document.getElementById('startBox').addEventListener('click', startBox);
+document.getElementById('stopBox').addEventListener('click', stopBox);
+
+/* =========================================
+   EXERCISES — save plans, TTS read
+   ========================================= */
+const planList=document.getElementById('planList');
+document.getElementById('savePlan').addEventListener('click', ()=>{
+  const event=document.getElementById('gxEvent').value.trim();
+  const story=document.getElementById('gxStory').value.trim();
+  const ask=document.getElementById('gxAsk').value.trim();
+  const choose=document.getElementById('gxChoose').value.trim();
+  if(!event || !choose){ toast('Add event and action.'); return; }
+  state.plans.push({id:Date.now(), ts:Date.now(), event, story, ask, choose}); save(); renderPlans();
+  document.getElementById('gxEvent').value=''; document.getElementById('gxStory').value=''; document.getElementById('gxAsk').value=''; document.getElementById('gxChoose').value='';
+  toast('Plan saved');
+});
+document.getElementById('readPlan').addEventListener('click', ()=>{
+  const e=document.getElementById('gxEvent').value.trim();
+  const c=document.getElementById('gxChoose').value.trim();
+  if(!e && !c){ toast('Write something to read.'); return; }
+  speak(`Event: ${e||'...'} . I choose this holy action: ${c||'...'}. With God’s help, I will respond with love and truth.`);
+});
+function renderPlans(){
+  planList.innerHTML='';
+  if(state.plans.length===0){ const d=document.createElement('div'); d.className='muted'; d.textContent='No plans yet.'; planList.appendChild(d); return; }
+  [...state.plans].sort((a,b)=>b.ts-a.ts).forEach(p=>{
+    const div=document.createElement('div'); div.className='item';
+    div.innerHTML=`
+      <div class="meta">${new Date(p.ts).toLocaleString()}</div>
+      <div><strong>Event:</strong> ${escapeHtml(p.event)}</div>
+      ${p.story?`<div><strong>Story:</strong> ${escapeHtml(p.story)}</div>`:''}
+      ${p.ask?`<div><strong>Ask God:</strong> ${escapeHtml(p.ask)}</div>`:''}
+      <div><strong>Action:</strong> ${escapeHtml(p.choose)}</div>
+      <div class="btn-row">
+        <button class="btn tiny" data-read="${p.id}">Read</button>
+        <button class="btn ghost tiny" data-del="${p.id}">Delete</button>
+      </div>`;
+    planList.appendChild(div);
+  });
+}
+planList.addEventListener('click',(e)=>{
+  const del=e.target.getAttribute('data-del');
+  const read=e.target.getAttribute('data-read');
+  if(del){
+    const idx=state.plans.findIndex(x=>x.id===Number(del));
+    if(idx>-1){
+      const removed=state.plans.splice(idx,1)[0]; save(); renderPlans();
+      const t=document.getElementById('toast'); t.innerHTML='Deleted. <button class="btn tiny" id="undoPlan">Undo</button>'; t.classList.add('show');
+      const undo=()=>{ state.plans.push(removed); save(); renderPlans(); t.classList.remove('show'); toast('Restored'); };
+      document.addEventListener('click', function handler(ev){ if(ev.target && ev.target.id==='undoPlan'){ undo(); document.removeEventListener('click', handler); }}, {once:true});
+      setTimeout(()=>t.classList.remove('show'), 4000);
+    }
+  }
+  if(read){
+    const p=state.plans.find(x=>x.id===Number(read)); if(!p) return;
+    speak(`Event: ${p.event}. Story: ${p.story||'...'} . I hear God saying: ${p.ask||'...'} . My chosen action: ${p.choose}. With God’s help, I will be slow to anger and quick to listen.`);
+  }
+});
+
+/* =========================================
+   INFO/ABOUT actions
+   ========================================= */
+document.getElementById('exportAll').addEventListener('click', ()=>{
+  const dump=JSON.stringify(state,null,2); const blob=new Blob([dump],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='slow-to-anger-data.json'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{a.remove(); URL.revokeObjectURL(url);},0); toast('Data exported');
+});
+document.getElementById('resetAll').addEventListener('click', ()=>{
+  const backup=JSON.stringify(state);
+  localStorage.removeItem(KEY);
+  Object.assign(state,{view:'home', musicOn:false, entries:[], voice:{name:null, rate:0.95, pitch:1.0}, plans:[]});
+  save(); renderAll();
+  const t=document.getElementById('toast'); t.innerHTML='App reset. <button class="btn tiny" id="undoReset">Undo</button>'; t.classList.add('show');
+  document.addEventListener('click', function handler(e){ if(e.target && e.target.id==='undoReset'){ try{ Object.assign(state, JSON.parse(backup)); save(); renderAll(); }catch(e){} t.classList.remove('show'); }}, {once:true});
+  setTimeout(()=>t.classList.remove('show'),5000);
+});
+
+/* =========================================
+   RENDER ALL
+   ========================================= */
+function renderAll(){
+  renderStats(); drawChart(); renderEntries(); renderPrayers(); renderPlans();
+  document.getElementById('musicBtn').setAttribute('aria-pressed', state.musicOn?'true':'false');
+  document.getElementById('musicIcon').textContent = state.musicOn ? '⏸' : '▶︎';
+  show(state.view||'home');
+}
+load();
+renderAll();
+</script>
+</body>
+</html>
